@@ -3,9 +3,7 @@ package kr.yp_crowdfunding.persistence.dao;
 import kr.yp_crowdfunding.persistence.dto.UserDTO;
 
 import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +31,29 @@ public class UsersDAO extends DAO {
 
     public UsersDAO(DataSource dataSource) {
         super(dataSource);
+    }
+
+    private static final String INSERT_SQL =
+            "INSERT INTO users (id, address, name, type, regdate, login_id, password) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+    public void insert(UserDTO userDTO) throws SQLException {
+        try(Connection conn = dataSource.getConnection();
+            PreparedStatement psmt = conn.prepareStatement(INSERT_SQL)){
+
+            psmt.setLong(1, userDTO.getUserID());
+            psmt.setString(2, userDTO.getAddress());
+            psmt.setString(3, userDTO.getName());
+//          psmt.setString(4, userDTO.getUserType().name());
+            //기본을 SUPPORT로 받는 형식으로??
+            psmt.setString(4, UserDTO.UserType.SUPPORTER.name());
+            psmt.setTimestamp(5, new java.sql.Timestamp(userDTO.getRegDate().getTime()));
+            psmt.setString(6, userDTO.getLoginID());
+            psmt.setString(7, userDTO.getEncryptedPassword());
+
+            psmt.executeUpdate();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
 
