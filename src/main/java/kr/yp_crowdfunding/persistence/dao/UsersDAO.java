@@ -33,19 +33,18 @@ public class UsersDAO extends DAO {
         super(dataSource);
     }
 
-    private static final String INSERT_SQL =
-            "INSERT INTO users (id, address, name, type, regdate, login_id, password) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
+    //Create(생성) 기능
     public void insert(UserDTO userDTO) throws SQLException {
+        final String INSERT_SQL =
+                "INSERT INTO users (id, address, name, type, regdate, login_id, password) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
         try(Connection conn = dataSource.getConnection();
             PreparedStatement psmt = conn.prepareStatement(INSERT_SQL)){
 
             psmt.setLong(1, userDTO.getUserID());
             psmt.setString(2, userDTO.getAddress());
             psmt.setString(3, userDTO.getName());
-//          psmt.setString(4, userDTO.getUserType().name());
-            //기본을 SUPPORT로 받는 형식으로??
-            psmt.setString(4, UserDTO.UserType.SUPPORTER.name());
+            psmt.setString(4, userDTO.getUserType().name());
             psmt.setTimestamp(5, new java.sql.Timestamp(userDTO.getRegDate().getTime()));
             psmt.setString(6, userDTO.getLoginID());
             psmt.setString(7, userDTO.getEncryptedPassword());
@@ -56,6 +55,33 @@ public class UsersDAO extends DAO {
         }
     }
 
+    //Read(조회)기능
+    public UserDTO getUserById(long id) throws SQLException {
+        final String READ_SQL = "SELECT * FROM users WHERE id = ?";
+        UserDTO dto = null;
+
+        try(Connection conn = dataSource.getConnection();
+        PreparedStatement psmt = conn.prepareStatement(READ_SQL)){
+
+            psmt.setLong(1, id);
+
+            try (ResultSet rs = psmt.executeQuery()){
+                if(rs.next()){
+                    dto = new UserDTO();
+
+                    dto.setUserID(rs.getLong(Columns.ID.name));
+                    dto.setAddress(rs.getString(Columns.ADDRESS.name));
+                    dto.setName(rs.getString(Columns.NAME.name));
+                    dto.setUserType(UserDTO.UserType.valueOf(rs.getString(Columns.TYPE.name)));
+                    dto.setEncryptedPassword(rs.getString(Columns.PASSWORD.name));
+                    dto.setRegDate(rs.getDate(Columns.REGDATE.name));
+                    dto.setLoginID(rs.getString(Columns.LOGIN_ID.name));
+
+                }
+            }
+        }
+        return dto;
+    }
 
     public List<UserDTO> getAllUsers() throws SQLException {
         final String sql = "select * from users";
@@ -76,6 +102,36 @@ public class UsersDAO extends DAO {
             result.add(dto);
         }
         return result;
+    }
+
+    //Update(수정) 기능
+    public void update(UserDTO userDTO) throws SQLException {
+        //id(pk), regdate는 수정 불가 type은 수정 허용하긴 해야하려나?
+        final String UPDATE_SQL = "UPDATE users SET address = ?, name = ?, type = ?, loginId = ?, password = ?";
+
+        try(Connection conn = dataSource.getConnection();
+        PreparedStatement psmt = conn.prepareStatement(UPDATE_SQL)){
+
+            psmt.setString(1, userDTO.getAddress());
+            psmt.setString(2, userDTO.getName());
+            psmt.setString(3, userDTO.getUserType().name());
+            psmt.setString(4, userDTO.getLoginID());
+            psmt.setString(5, userDTO.getEncryptedPassword());
+
+        }
+    }
+
+    //Delete(삭제) 기능
+    //아마 update로 삭제된 유저 덮을거 같긴한데 혹시 모를 삭제 대비로 만들긴 함
+    public void delete(UserDTO userDTO) throws SQLException {
+        final String DELETE_SQL = "DELETE FROM users WHERE id = ?";
+
+        try(Connection conn = dataSource.getConnection();
+        PreparedStatement psmt = conn.prepareStatement(DELETE_SQL)){
+
+            psmt.setLong(1, userDTO.getUserID());
+            psmt.executeUpdate();
+        }
     }
 
 }
