@@ -87,10 +87,12 @@ public class UsersDAO extends DAO {
         final String sql = "select * from users";
         List<UserDTO> result = new ArrayList<>();
 
-        try(Statement statement = dataSource.getConnection().createStatement()){
-            ResultSet rs = statement.executeQuery(sql);
-            UserDTO dto = new UserDTO();
+        try(Statement statement = dataSource.getConnection().createStatement();
+            ResultSet rs = statement.executeQuery(sql)){
+
             while(rs.next()){
+                UserDTO dto = new UserDTO();
+
                 dto.setUserID(rs.getLong(Columns.ID.name));
                 dto.setAddress(rs.getString(Columns.ADDRESS.name));
                 dto.setName(rs.getString(Columns.NAME.name));
@@ -98,8 +100,9 @@ public class UsersDAO extends DAO {
                 dto.setEncryptedPassword(rs.getString(Columns.PASSWORD.name));
                 dto.setRegDate(rs.getDate(Columns.REGDATE.name));
                 dto.setLoginID(rs.getString(Columns.LOGIN_ID.name));
+
+                result.add(dto);
             }
-            result.add(dto);
         }
         return result;
     }
@@ -107,10 +110,10 @@ public class UsersDAO extends DAO {
     //Update(수정) 기능
     public void update(UserDTO userDTO) throws SQLException {
         //id(pk), regdate는 수정 불가 type은 수정 허용하긴 해야하려나?
-        final String UPDATE_SQL = "UPDATE users SET address = ?, name = ?, type = ?, loginId = ?, password = ?";
+        final String UPDATE_SQL = "UPDATE users SET address = ?, name = ?, type = ?, loginId = ?, password = ? WHERE id = ?";
 
         try(Connection conn = dataSource.getConnection();
-        PreparedStatement psmt = conn.prepareStatement(UPDATE_SQL)){
+            PreparedStatement psmt = conn.prepareStatement(UPDATE_SQL)){
 
             psmt.setString(1, userDTO.getAddress());
             psmt.setString(2, userDTO.getName());
@@ -118,18 +121,19 @@ public class UsersDAO extends DAO {
             psmt.setString(4, userDTO.getLoginID());
             psmt.setString(5, userDTO.getEncryptedPassword());
 
+            psmt.executeUpdate();
         }
     }
 
     //Delete(삭제) 기능
     //아마 update로 삭제된 유저 덮을거 같긴한데 혹시 모를 삭제 대비로 만들긴 함
-    public void delete(UserDTO userDTO) throws SQLException {
+    public void delete(long id) throws SQLException {
         final String DELETE_SQL = "DELETE FROM users WHERE id = ?";
 
         try(Connection conn = dataSource.getConnection();
         PreparedStatement psmt = conn.prepareStatement(DELETE_SQL)){
 
-            psmt.setLong(1, userDTO.getUserID());
+            psmt.setLong(1, id);
             psmt.executeUpdate();
         }
     }
