@@ -42,8 +42,6 @@ public class FailReasonsDAO extends DAO{
             psmt.setTimestamp(3,  new java.sql.Timestamp(failReasonDTO.getDate().getTime()));
 
             psmt.executeUpdate();
-        }catch (SQLException e){
-            e.printStackTrace();
         }
     }
 

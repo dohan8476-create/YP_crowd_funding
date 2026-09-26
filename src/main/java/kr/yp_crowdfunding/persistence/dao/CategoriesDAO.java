@@ -39,8 +39,6 @@ public class CategoriesDAO extends DAO{
             psmt.setString(1, categoryDTO.getCategory().name());
             psmt.executeUpdate();
 
-        }catch (SQLException e){
-            e.printStackTrace();
         }
     }
 

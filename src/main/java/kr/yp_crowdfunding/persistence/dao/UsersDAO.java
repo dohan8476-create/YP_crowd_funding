@@ -49,8 +49,6 @@ public class UsersDAO extends DAO {
             psmt.setString(6, userDTO.getEncryptedPassword());
 
             psmt.executeUpdate();
-        }catch (SQLException e){
-            e.printStackTrace();
         }
     }
 
