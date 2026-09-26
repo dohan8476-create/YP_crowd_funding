@@ -75,7 +75,29 @@ public class FailReasonsDAO extends DAO{
         }
         return resultList;
     }
-    //Update는 오타 대비로 만들어야하나? 일단 오타말곤 크게 필요X
-    //Delete도 크게 필요 없을 거 같은데
-    //필요한 상황으로 가면 펀딩이 종료 되었을 때 자원관리를 위해 밀어주는 용도?
+    //Update는 오타 대비로 만들어둠
+    public void update(FailReasonDTO failReasonDTO) throws SQLException {
+        //reason은 내용 수정, id는 수정할 대상 지정
+        final String UPDATE_SQL = "UPDATE failReason SET reason = ? WHERE id = ?";
+
+        try(Connection conn = dataSource.getConnection();
+        PreparedStatement psmt = conn.prepareStatement(UPDATE_SQL)){
+
+            psmt.setString(1, failReasonDTO.getReason());
+            psmt.setLong(2, failReasonDTO.getId());
+
+            psmt.executeUpdate();
+        }
+    }
+
+    //Delete 펀딩이 종료 되었을 때 자원관리를 위해 밀어주는 용도로 필요할 듯
+    public void delete(long projectId) throws SQLException {
+        final String DELETE_SQL = "DELETE FROM failReason WHERE project_id = ?";
+
+        try(Connection conn = dataSource.getConnection();
+        PreparedStatement psmt = conn.prepareStatement(DELETE_SQL)){
+            psmt.setLong(1, projectId);
+            psmt.executeUpdate();
+        })
+    }
 }
