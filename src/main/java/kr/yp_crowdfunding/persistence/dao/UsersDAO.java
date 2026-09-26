@@ -36,18 +36,17 @@ public class UsersDAO extends DAO {
     //Create(생성) 기능
     public void insert(UserDTO userDTO) throws SQLException {
         final String INSERT_SQL =
-                "INSERT INTO users (id, address, name, type, regdate, login_id, password) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                "INSERT INTO users (address, name, type, regdate, login_id, password) VALUES (?, ?, ?, ?, ?, ?)";
 
         try(Connection conn = dataSource.getConnection();
             PreparedStatement psmt = conn.prepareStatement(INSERT_SQL)){
 
-            psmt.setLong(1, userDTO.getUserID());
-            psmt.setString(2, userDTO.getAddress());
-            psmt.setString(3, userDTO.getName());
-            psmt.setString(4, userDTO.getUserType().name());
-            psmt.setTimestamp(5, new java.sql.Timestamp(userDTO.getRegDate().getTime()));
-            psmt.setString(6, userDTO.getLoginID());
-            psmt.setString(7, userDTO.getEncryptedPassword());
+            psmt.setString(1, userDTO.getAddress());
+            psmt.setString(2, userDTO.getName());
+            psmt.setString(3, userDTO.getUserType().name());
+            psmt.setTimestamp(4, new java.sql.Timestamp(userDTO.getRegDate().getTime()));
+            psmt.setString(5, userDTO.getLoginID());
+            psmt.setString(6, userDTO.getEncryptedPassword());
 
             psmt.executeUpdate();
         }catch (SQLException e){

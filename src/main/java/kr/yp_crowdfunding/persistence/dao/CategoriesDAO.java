@@ -31,13 +31,12 @@ public class CategoriesDAO extends DAO{
     //Create(생성) 기능
     public void insert(CategoryDTO categoryDTO) throws SQLException {
         final String INSERT_SQL =
-                "INSERT INTO categories (projectID, categotry) VALUES (?, ?)";
+                "INSERT INTO categories (categotry) VALUES (?)";
 
         try(Connection conn = dataSource.getConnection();
             PreparedStatement psmt = conn.prepareStatement(INSERT_SQL)){
 
-            psmt.setLong(1, categoryDTO.getProjectID());
-            psmt.setString(2, categoryDTO.getCategory().name());
+            psmt.setString(1, categoryDTO.getCategory().name());
             psmt.executeUpdate();
 
         }catch (SQLException e){

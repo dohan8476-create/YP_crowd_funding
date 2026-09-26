@@ -32,15 +32,14 @@ public class FailReasonsDAO extends DAO{
     //Create(생성) 기능
     public void insert(FailReasonDTO failReasonDTO) throws SQLException {
         final String INSERT_SQL =
-                "INSERT INTO failReason (id, project_Id, reason, date) VALUES (?, ?, ?, ?)";
+                "INSERT INTO failReason (project_Id, reason, date) VALUES (?, ?, ?)";
 
         try(Connection conn = dataSource.getConnection();
             PreparedStatement psmt = conn.prepareStatement(INSERT_SQL)){
 
-            psmt.setLong(1, failReasonDTO.getId());
-            psmt.setLong(2,failReasonDTO.getProjectID());
-            psmt.setString(3,failReasonDTO.getReason());
-            psmt.setTimestamp(4,  new java.sql.Timestamp(failReasonDTO.getDate().getTime()));
+            psmt.setLong(1,failReasonDTO.getProjectID());
+            psmt.setString(2,failReasonDTO.getReason());
+            psmt.setTimestamp(3,  new java.sql.Timestamp(failReasonDTO.getDate().getTime()));
 
             psmt.executeUpdate();
         }catch (SQLException e){
