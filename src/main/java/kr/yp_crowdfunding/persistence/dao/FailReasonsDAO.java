@@ -32,7 +32,7 @@ public class FailReasonsDAO extends DAO{
     //Create(생성) 기능
     public void insert(FailReasonDTO failReasonDTO) throws SQLException {
         final String INSERT_SQL =
-                "INSERT INTO failReason (id, projectId, reason, date) VALUES (?, ?, ?, ?)";
+                "INSERT INTO failReason (id, project_Id, reason, date) VALUES (?, ?, ?, ?)";
 
         try(Connection conn = dataSource.getConnection();
             PreparedStatement psmt = conn.prepareStatement(INSERT_SQL)){
@@ -63,10 +63,10 @@ public class FailReasonsDAO extends DAO{
                 while (rs.next()){
                     FailReasonDTO dto = new FailReasonDTO();
 
-                    dto.setId(rs.getLong(Columns.ID.name()));
-                    dto.setProjectID(rs.getLong(Columns.PROJECT_ID.name()));
-                    dto.setReason(rs.getString(Columns.REASON.name()));
-                    dto.setDate(rs.getTimestamp(Columns.DATE.name()));
+                    dto.setId(rs.getLong(Columns.ID.name));
+                    dto.setProjectID(rs.getLong(Columns.PROJECT_ID.name));
+                    dto.setReason(rs.getString(Columns.REASON.name));
+                    dto.setDate(rs.getTimestamp(Columns.DATE.name));
 
                     resultList.add(dto);
                 }
@@ -98,6 +98,6 @@ public class FailReasonsDAO extends DAO{
         PreparedStatement psmt = conn.prepareStatement(DELETE_SQL)){
             psmt.setLong(1, projectId);
             psmt.executeUpdate();
-        })
+        }
     }
 }
