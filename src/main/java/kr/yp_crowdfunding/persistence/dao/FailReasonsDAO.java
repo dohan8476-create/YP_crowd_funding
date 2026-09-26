@@ -1,6 +1,11 @@
 package kr.yp_crowdfunding.persistence.dao;
 
+import kr.yp_crowdfunding.persistence.dto.FailReasonDTO;
+
 import javax.sql.DataSource;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FailReasonsDAO extends DAO{
 
@@ -23,4 +28,54 @@ public class FailReasonsDAO extends DAO{
     public FailReasonsDAO(DataSource dataSource) {
         super(dataSource);
     }
+
+    //Create(생성) 기능
+    public void insert(FailReasonDTO failReasonDTO) throws SQLException {
+        final String INSERT_SQL =
+                "INSERT INTO failReason (id, projectId, reason, date) VALUES (?, ?, ?, ?)";
+
+        try(Connection conn = dataSource.getConnection();
+            PreparedStatement psmt = conn.prepareStatement(INSERT_SQL)){
+
+            psmt.setLong(1, failReasonDTO.getId());
+            psmt.setLong(2,failReasonDTO.getProjectID());
+            psmt.setString(3,failReasonDTO.getReason());
+            psmt.setTimestamp(4,  new java.sql.Timestamp(failReasonDTO.getDate().getTime()));
+
+            psmt.executeUpdate();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    //Read(조회) 기능
+    //얘는 일반적으로 프로젝트에서 가져와야하는거 같으니 조회기준을 projectId로 전체 조회
+    //단일 조회는 필요하려나?
+    public List<FailReasonDTO> getFailReasons(long projectId) throws SQLException {
+        final String READ_SQL = "SELECT * FROM failReason WHERE project_id = ?";
+        List<FailReasonDTO> resultList = new ArrayList<>();
+
+        try(Connection conn = dataSource.getConnection();
+        PreparedStatement psmt = conn.prepareStatement(READ_SQL)){
+            psmt.setLong(1, projectId);
+
+            try (ResultSet rs = psmt.executeQuery()){
+                while (rs.next()){
+                    FailReasonDTO dto = new FailReasonDTO();
+
+                    dto.setId(rs.getLong(Columns.ID.name()));
+                    dto.setProjectID(rs.getLong(Columns.PROJECT_ID.name()));
+                    dto.setReason(rs.getString(Columns.REASON.name()));
+                    dto.setDate(rs.getTimestamp(Columns.DATE.name()));
+
+                    resultList.add(dto);
+                }
+            }
+
+        }
+        return resultList;
+    }
+    //Update는 오타 대비로 만들어야하나? 일단 오타말곤 크게 필요X
+    //Delete도 크게 필요 없을 거 같은데
+    //필요한 상황으로 가면 펀딩이 종료 되었을 때 자원관리를 위해 밀어주는 용도?
 }
