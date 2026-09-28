@@ -117,6 +117,7 @@ public class UsersDAO extends DAO {
             psmt.setString(3, userDTO.getUserType().name());
             psmt.setString(4, userDTO.getLoginID());
             psmt.setString(5, userDTO.getEncryptedPassword());
+            psmt.setLong(6, userDTO.getUserID());
 
             psmt.executeUpdate();
         }
